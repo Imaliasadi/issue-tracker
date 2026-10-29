@@ -82,53 +82,15 @@ tsconfig.json
 <files>
 This section contains the contents of the repository's files.
 
+<file path="app/page.tsx">
+export default function Home() {
+  return <div>Yo wrld</div>;
+}
+</file>
+
 <file path="app/theme-config.css">
 .radix-themes {
   --default-font-family: var(--font-inter);
-}
-</file>
-
-<file path="app/issues/new/page.tsx">
-"use client";
-
-import { Button, TextField } from "@radix-ui/themes";
-import SimpleMde from "react-simplemde-editor";
-
-function NewIssuePage() {
-  return (
-    <div className="max-w-xl space-y-3">
-      <TextField.Root placeholder="Title" />
-      <SimpleMde placeholder="Description" />
-      <Button>Submit new Issue</Button>
-    </div>
-  );
-}
-
-export default NewIssuePage;
-</file>
-
-<file path="app/globals.css">
-@import "tailwindcss";
-
-:root {
-}
-
-@theme inline {
-}
-
-@media (prefers-color-scheme: dark) {
-}
-
-body {
-  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
-}
-</file>
-
-<file path="app/page.tsx">
-import Image from "next/image";
-
-export default function Home() {
-  return <div>Yo wrld</div>;
 }
 </file>
 
@@ -356,6 +318,47 @@ export async function POST(request: NextRequest) {
 }
 </file>
 
+<file path="app/issues/new/page.tsx">
+"use client";
+
+import { Button, TextField } from "@radix-ui/themes";
+import SimpleMde from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
+import { useForm, Controller } from "react-hook-form";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
+interface issueForm {
+  title: string;
+  description: string;
+}
+
+function NewIssuePage() {
+  const { register, control, handleSubmit } = useForm<issueForm>();
+  const router = useRouter();
+  return (
+    <form
+      className="max-w-xl space-y-3"
+      onSubmit={handleSubmit(async (data) => {
+        await axios.post("/api/issues", data);
+        router.push("/issues");
+      })}
+    >
+      <TextField.Root placeholder="Title" {...register("title")} />
+      <Controller
+        name="description"
+        control={control}
+        render={({ field }) => <SimpleMde placeholder="Description" {...field} />}
+      />
+
+      <Button>Submit new Issue</Button>
+    </form>
+  );
+}
+
+export default NewIssuePage;
+</file>
+
 <file path="app/lib/prisma.ts">
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
@@ -397,6 +400,23 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export default prisma;
+</file>
+
+<file path="app/globals.css">
+@import "tailwindcss";
+
+:root {
+}
+
+@theme inline {
+}
+
+@media (prefers-color-scheme: dark) {
+}
+
+body {
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
 </file>
 
 <file path="app/NavBar.tsx">
@@ -599,7 +619,7 @@ export default Issues;
 
 <file path="app/layout.tsx">
 import "@radix-ui/themes/styles.css";
-import { Theme, ThemePanel } from "@radix-ui/themes";
+import { Theme } from "@radix-ui/themes";
 import type { Metadata } from "next";
 import "./theme-config.css";
 import "./globals.css";
@@ -646,13 +666,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     "@prisma/adapter-mariadb": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "@radix-ui/themes": "^3.3.0",
+    "axios": "^1.21.0",
     "classnames": "^2.5.1",
     "dotenv": "^18.0.9",
-    "easymode": "^1.0.0",
+    "easymde": "^2.21.0",
     "mariadb": "^3.5.4",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-hook-form": "^7.91.0",
     "react-icons": "^5.7.0",
     "react-simplemde-editor": "^5.2.0",
     "zod": "^4.6.7"
