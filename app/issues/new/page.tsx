@@ -10,6 +10,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createIssueSchema } from "@/app/validationSchema";
 import z from "zod";
+import ErrorMessage from "@/app/components/ErrorMessage";
 
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -49,17 +50,13 @@ export default function NewIssuePage() {
       )}
       <form className="space-y-3" onSubmit={onSubmit}>
         <TextField.Root placeholder="Title" {...register("title")} />
-        {errors.title && <Text color="red">{errors.title.message}</Text>}
+        <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <Controller
           name="description"
           control={control}
           render={({ field }) => <SimpleMde placeholder="Description" {...field} />}
         />
-        {errors.description && (
-          <Text className="block" color="red">
-            {errors.description.message}
-          </Text>
-        )}
+        <ErrorMessage>{errors.description?.message}</ErrorMessage>
         <Button type="submit">Submit new Issue</Button>
       </form>
     </div>
