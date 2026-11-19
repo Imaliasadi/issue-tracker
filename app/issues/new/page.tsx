@@ -44,7 +44,6 @@ export default function NewIssuePage() {
       }
     }
   });
-
   return (
     <div className="max-w-xl">
       {error && (
